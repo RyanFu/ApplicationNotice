@@ -17,7 +17,6 @@
 @property (weak, nonatomic) IBOutlet UILabel *pushTitleLabel;
 @property (weak, nonatomic) IBOutlet UILabel *pushDescLabel;
 @property (weak, nonatomic) IBOutlet UILabel *pushTimeLabel;
-
 @property (strong, nonatomic, readwrite) UIView *contentView; ///< 内容view
 
 @property (strong, nonatomic) NSDictionary *userInfo; ///< 推送数据
@@ -70,7 +69,7 @@
 }
 
 - (UIView *)contentView {
-    
+
     if (!_contentView) {
         _contentView = [[NSBundle bundleForClass:[self class]] loadNibNamed:NSStringFromClass([self class]) owner:self options:nil][0];
     }
@@ -84,6 +83,12 @@
                     clickBlock:(dispatch_block_t)clickBlock {
     if (sound) {
         AudioServicesPlaySystemSound(1312);
+    }
+
+    for (UIView *view in [UIApplication sharedApplication].keyWindow.subviews) {
+        if ([view isKindOfClass:[self class]]) {
+            [view removeFromSuperview];
+        }
     }
 
     BMApplicationNoticeView *view = [BMApplicationNoticeView new];
@@ -104,7 +109,7 @@
     }];
     
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.01 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-        [UIView animateWithDuration:0.25 delay:0 options:0 animations:^{
+        [UIView animateWithDuration:0.25 delay:0 options:UIViewAnimationOptionCurveEaseIn animations:^{
             [view mas_updateConstraints:^(MASConstraintMaker *make) {
                 make.top.mas_equalTo(0);
             }];
@@ -114,7 +119,7 @@
 
     __weak typeof(BMApplicationNoticeView) *wself = view;
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(3.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-        [UIView animateWithDuration:0.25 delay:0 options:0 animations:^{
+        [UIView animateWithDuration:0.25 delay:0 options:UIViewAnimationOptionCurveEaseIn animations:^{
             __weak typeof(BMApplicationNoticeView) *sself = wself;
             [sself mas_updateConstraints:^(MASConstraintMaker *make) {
                 make.top.mas_equalTo(-75);
