@@ -636,6 +636,7 @@
 				3227B6911E95F64F00205814 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		3227B6921E95F64F00205814 /* Build configuration list for PBXNativeTarget "ApplicationNoticeTests" */ = {
 			isa = XCConfigurationList;
@@ -644,6 +645,7 @@
 				3227B6941E95F64F00205814 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		3227B6951E95F64F00205814 /* Build configuration list for PBXNativeTarget "ApplicationNoticeUITests" */ = {
 			isa = XCConfigurationList;
@@ -652,6 +654,7 @@
 				3227B6971E95F64F00205814 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
