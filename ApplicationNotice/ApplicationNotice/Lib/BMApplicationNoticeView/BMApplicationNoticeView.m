@@ -8,7 +8,6 @@
 
 #import "BMApplicationNoticeView.h"
 #import <AudioToolbox/AudioToolbox.h>
-#import "Masonry.h"
 
 @interface BMApplicationNoticeView ()
 
@@ -85,12 +84,12 @@
         AudioServicesPlaySystemSound(1312);
     }
 
+    // 需优化
     for (UIView *view in [UIApplication sharedApplication].keyWindow.subviews) {
         if ([view isKindOfClass:[self class]]) {
             [view removeFromSuperview];
         }
     }
-
     BMApplicationNoticeView *view = [BMApplicationNoticeView new];
     view.backgroundScrollView.showsVerticalScrollIndicator = NO;
     view.backgroundScrollView.showsHorizontalScrollIndicator = NO;
@@ -101,18 +100,19 @@
     view.clickBlock = clickBlock;
 
     [view.backgroundScrollView addObserver:view forKeyPath:@"contentOffset" options:NSKeyValueObservingOptionNew | NSKeyValueObservingOptionOld context:NULL];
-    [[UIApplication sharedApplication].keyWindow addSubview:view];
-    [view mas_makeConstraints:^(MASConstraintMaker *make) {
-        make.left.right.mas_equalTo(0);
-        make.top.mas_equalTo(-75);
-        make.height.mas_equalTo(100);
-    }];
-    
+    UIWindow *win = [UIApplication sharedApplication].keyWindow;
+    [win addSubview:view];
+
+    view.translatesAutoresizingMaskIntoConstraints = NO;
+    NSLayoutConstraint *constraintTop = [NSLayoutConstraint constraintWithItem:view attribute:NSLayoutAttributeTop relatedBy:NSLayoutRelationEqual toItem:win attribute:NSLayoutAttributeTop multiplier:1.0 constant:-75.0];
+    NSLayoutConstraint *constraintLeft = [NSLayoutConstraint constraintWithItem:view attribute:NSLayoutAttributeLeft relatedBy:NSLayoutRelationEqual toItem:win attribute:NSLayoutAttributeLeft multiplier:1.0 constant:0];
+    NSLayoutConstraint *constraintRight = [NSLayoutConstraint constraintWithItem:view attribute:NSLayoutAttributeRight relatedBy:NSLayoutRelationEqual toItem:win attribute:NSLayoutAttributeRight multiplier:1.0 constant:0];
+    NSLayoutConstraint *constraintHeight = [NSLayoutConstraint constraintWithItem:view attribute:NSLayoutAttributeHeight relatedBy:NSLayoutRelationEqual toItem:nil attribute:0 multiplier:0 constant:100];
+    [win addConstraints:@[constraintTop, constraintLeft, constraintHeight, constraintRight]];
+
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.01 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
         [UIView animateWithDuration:0.25 delay:0 options:UIViewAnimationOptionCurveEaseIn animations:^{
-            [view mas_updateConstraints:^(MASConstraintMaker *make) {
-                make.top.mas_equalTo(0);
-            }];
+            constraintTop.constant = 0;
             [view.superview layoutIfNeeded];
         } completion:nil];
     });
@@ -121,9 +121,7 @@
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(3.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
         [UIView animateWithDuration:0.25 delay:0 options:UIViewAnimationOptionCurveEaseIn animations:^{
             __weak typeof(BMApplicationNoticeView) *sself = wself;
-            [sself mas_updateConstraints:^(MASConstraintMaker *make) {
-                make.top.mas_equalTo(-75);
-            }];
+            constraintTop.constant = -75.0;
             [sself.superview layoutIfNeeded];
         } completion:^(BOOL finished) {
             __weak typeof(BMApplicationNoticeView) *sself = wself;
@@ -141,11 +139,15 @@
 #pragma mark - 私有方法
 
 - (void)addUI {
-    [self addSubview:self.contentView];
-    [self.contentView mas_makeConstraints:^(MASConstraintMaker *make) {
-        make.edges.mas_equalTo(0);
-    }];
     
+    [self addSubview:self.contentView];
+    self.contentView.translatesAutoresizingMaskIntoConstraints = NO;
+    NSLayoutConstraint *constraintTop    = [NSLayoutConstraint constraintWithItem:self.contentView attribute:NSLayoutAttributeTop relatedBy:NSLayoutRelationEqual toItem:self attribute:NSLayoutAttributeTop multiplier:1.0 constant:0];
+    NSLayoutConstraint *constraintLeft   = [NSLayoutConstraint constraintWithItem:self.contentView attribute:NSLayoutAttributeLeft relatedBy:NSLayoutRelationEqual toItem:self attribute:NSLayoutAttributeLeft multiplier:1.0 constant:0];
+    NSLayoutConstraint *constraintBottom = [NSLayoutConstraint constraintWithItem:self.contentView attribute:NSLayoutAttributeBottom relatedBy:NSLayoutRelationEqual toItem:self attribute:NSLayoutAttributeBottom multiplier:1.0 constant:0];
+    NSLayoutConstraint *constraintRight  = [NSLayoutConstraint constraintWithItem:self.contentView attribute:NSLayoutAttributeRight relatedBy:NSLayoutRelationEqual toItem:self attribute:NSLayoutAttributeRight multiplier:1.0 constant:0];
+    [self addConstraints:@[constraintTop, constraintLeft, constraintBottom, constraintRight]];
+
     NSDictionary *infoDictionary = [[NSBundle bundleForClass:[self class]] infoDictionary];
     
     NSString *appName = [infoDictionary objectForKey:@"CFBundleDisplayName"];
